@@ -3,13 +3,17 @@
 public partial class Player
 {
     [SerializeField] private float _runSpeed = 45f;
-    [SerializeField] private float _groundFriction = 0.5f;
+    [SerializeField] private float _flySpeed = 33f;
+    [SerializeField] private float _groundFrictionFactor = 0.5f;
+    [SerializeField] private float _airFrictionFactor = 0.9f;
     [SerializeField] private float _jumpHeight = 3f;
     [SerializeField] private float _gravity = 0.981f;
+    [SerializeField] private bool _canFly;
 
     private const float JumpJoyAxisThreshold = 0.5f;
 
     private bool _isClimbing;
+    private bool _isFlying;
     private bool _canJump;
 
     private bool HasCollided
@@ -40,27 +44,46 @@ public partial class Player
         // horizontal movement
         if (!_isClimbing)
         {
-            // TODO: Acceleration, inherit platform velocity
-            _force.x = input.x * _runSpeed;
+            // TODO: inherit platform velocity
+            _force.x = input.x*_runSpeed;
         }
+
+        // vertical movement
+
+        // climbing
+
 
         // jumping
         if (input.y >= JumpJoyAxisThreshold && _canJump)
         {
             _force.y = GetJumpForce(_jumpHeight);
             _canJump = false;
+            _isFlying = true & _canFly;
         }
 
-        // climbing
-        // flying
-        // apply gravity here
-        _force.y -= Mathf.Abs(_gravity);
+        if (_isFlying)
+        {
+            _force.y = input.y*_flySpeed;
+        }
+        else
+        {
+            // apply gravity here
+            _force.y -= Mathf.Abs(_gravity);
+        }
 
         // perform movement here
         // _acceleration = _force / mass; (assume 1.0f, use force in place of acceleration)
         _velocity += _force * Time.deltaTime;
+        _velocity.x = Mathf.Clamp(_velocity.x, -_runSpeed, _runSpeed);
+        //_velocity.y = Mathf.Clamp(_velocity.y, );
 
         Controller.Move((_velocity - _force * Time.deltaTime / 2f) * Time.deltaTime);
+
+        if (_isFlying)
+        {
+            _velocity.y *= _airFrictionFactor;
+            _velocity.x *= _airFrictionFactor;
+        }
         
         // perform collisions here
         if (!HasCollided) return;
@@ -69,6 +92,8 @@ public partial class Player
 
         if (HasCollidedSides)
         {
+            Debug.Log("motherfuck");
+
             undoCollideMovement.x *= -1f;
 
             _velocity.x = 0f;
@@ -86,8 +111,9 @@ public partial class Player
             // apply ground friction here
             if (HasCollidedBelow)
             {
-                _velocity.x *= _groundFriction;
+                _velocity.x *= _groundFrictionFactor;
                 _canJump = true;
+                _isFlying = false;
             }
         }
         
