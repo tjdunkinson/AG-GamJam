@@ -1,0 +1,44 @@
+https:# .gitignore
+#####################################################
+# Ignore rules for git commits.
+# Excludes files from commits by regular expression.
+# See https://help.github.com/articles/ignoring-files
+#####################################################
+# Updated 07/12/2012 13:09 by Liam Jenkin
+
+# Ignore Unity3D temporary/cache directories
+
+[Ll]ibrary/*/
+[Tt]emp/
+[Oo]bj/
+
+# Note: For excluding Library, external version control 
+# 	must be enabled in Unity project settings else 
+#	links between projects and resources may break!
+
+# Ignore auto-generated project files
+
+*.suo
+*.sln
+*.csproj
+*.unityproj
+*.user
+*.pidb
+*.userprefs
+
+# Unignore specifics to assist in imported assets 
+# and other metadata from link breakage
+![Ll]ibrary/*.asset
+![Ll]ibrary/AssetImportState
+![Ll]ibrary/assetservercachev3
+![Ll]ibrary/AssetVersioning.db
+![Ll]ibrary/BuildPlayer.prefs
+![Ll]ibrary/expandedItems
+![Ll]ibrary/guidmapper
+![Ll]ibrary/ScriptMapper
+![Ll]ibrary/unity default resources
+![Ll]ibrary/unity editor resources
+![Ll]ibrary/metadata/
+
+#ignore thumbnails created by windows
+[Tt]humbs.db
