@@ -14,7 +14,9 @@ public partial class Player
 
     private bool _isClimbing;
     private bool _isFlying;
+
     private bool _canJump;
+    private bool _canClimb;
 
     private bool HasCollided
     {
@@ -51,6 +53,21 @@ public partial class Player
         // vertical movement
 
         // climbing
+        if (_isClimbing)
+        {
+            ClimbingLogic(input);
+        }
+        if (_canClimb)
+        {
+            _canClimb = false;
+
+            // check for valid surface
+            _isClimbing = HasFoundClimbingSurface(_velocity.x);
+        }
+
+        // collide side
+        // if collision with box collider of no rotation (???)
+        // attach to face
 
 
         // jumping
@@ -79,25 +96,27 @@ public partial class Player
 
         Controller.Move((_velocity - _force * Time.deltaTime / 2f) * Time.deltaTime);
 
+        // post-move hackery
         if (_isFlying)
         {
             _velocity.y *= _airFrictionFactor;
             _velocity.x *= _airFrictionFactor;
         }
         
-        // perform collisions here
+        // end normal movement functions
         if (!HasCollided) return;
 
+        // perform collisions here
         Vector3 undoCollideMovement = _velocity * Time.deltaTime;
 
         if (HasCollidedSides)
         {
-            Debug.Log("motherfuck");
-
             undoCollideMovement.x *= -1f;
 
             _velocity.x = 0f;
             _force.x = 0f;
+
+            _canClimb = true;
         }
 
         if (HasCollidedAbove || HasCollidedBelow)
@@ -119,6 +138,37 @@ public partial class Player
         
         // perform adjustment movement
         transform.Translate(undoCollideMovement);
+    }
+
+    private bool HasFoundClimbingSurface(float horizontalDirection)
+    {
+        // raycast in direction
+        RaycastHit hitInfo;
+
+        if (Physics.Raycast(transform.position, (horizontalDirection > 0f ? Vector3.right : Vector3.left), out hitInfo,
+            Controller.radius * 2f))
+        {
+            if (!(hitInfo.collider is BoxCollider)) return false;
+
+            // get surface x-pos
+
+            // get surface apex
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ClimbingLogic(Vector2 input)
+    {
+        // climbing verticality
+
+        // leaping from wall (sideways motion)
+        
+        // climbing over
+
+        // touching ground (and not reattaching to wall)
     }
 
     private float GetJumpForce(float jumpHeight)
