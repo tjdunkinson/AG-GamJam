@@ -7,12 +7,14 @@ public partial class Player
     private string MovementAxisName { get { return _slot + " Movement"; }
     }
 
+    // NOTE: We invert the Y-axis input because up should be +1, not -1
+
     private Vector2 MovementAxis 
     {
         get
         {
-            return new Vector2(Input.GetAxisRaw(MovementAxisName + " X"), 
-                Input.GetAxisRaw(MovementAxisName + " Y"));
+            return new Vector2(Input.GetAxis(MovementAxisName + " X"), 
+                -Input.GetAxis(MovementAxisName + " Y"));
         }
     }
 
@@ -22,8 +24,8 @@ public partial class Player
     private Vector2 AimingAxis
     {
         get {
-            return new Vector2(Input.GetAxisRaw(AimingAxisName + " X"),
-                Input.GetAxisRaw(AimingAxisName + " Y")); 
+            return new Vector2(Input.GetAxis(AimingAxisName + " X"),
+                -Input.GetAxis(AimingAxisName + " Y")); 
         }
     }
 

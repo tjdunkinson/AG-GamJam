@@ -4,9 +4,13 @@ public partial class Player
 {
     [SerializeField] private float _runSpeed = 45f;
     [SerializeField] private float _groundFriction = 0.5f;
+    [SerializeField] private float _jumpHeight = 3f;
     [SerializeField] private float _gravity = 0.981f;
 
+    private const float JumpJoyAxisThreshold = 0.5f;
+
     private bool _isClimbing;
+    private bool _canJump;
 
     private bool HasCollided
     {
@@ -40,9 +44,14 @@ public partial class Player
             _force.x = input.x * _runSpeed;
         }
 
-        // vertical movement
-        // climbing
         // jumping
+        if (input.y >= JumpJoyAxisThreshold && _canJump)
+        {
+            _force.y = GetJumpForce(_jumpHeight);
+            _canJump = false;
+        }
+
+        // climbing
         // flying
         // apply gravity here
         _force.y -= Mathf.Abs(_gravity);
@@ -55,8 +64,6 @@ public partial class Player
         
         // perform collisions here
         if (!HasCollided) return;
-
-        Debug.Log("Collided!");
 
         Vector3 undoCollideMovement = _velocity * Time.deltaTime;
 
@@ -79,8 +86,8 @@ public partial class Player
             // apply ground friction here
             if (HasCollidedBelow)
             {
-                Debug.Log("Ground");
                 _velocity.x *= _groundFriction;
+                _canJump = true;
             }
         }
         
@@ -88,4 +95,8 @@ public partial class Player
         transform.Translate(undoCollideMovement);
     }
 
+    private float GetJumpForce(float jumpHeight)
+    {
+		return Mathf.Sqrt(2f * jumpHeight * _gravity);	
+    }
 }
