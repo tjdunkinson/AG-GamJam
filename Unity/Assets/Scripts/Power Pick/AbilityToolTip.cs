@@ -30,6 +30,8 @@ public class AbilityToolTip : MonoBehaviour
 			this.renderer.material.SetFloat("_BWtoColor", 1);
 		if(m_hover)
 			OnHover();
+		else
+			NormalSize();
 	}
 
 	public void OnHover()
@@ -38,7 +40,7 @@ public class AbilityToolTip : MonoBehaviour
 			transform.localScale = Vector3.Lerp(transform.localScale, m_maxSize, Time.deltaTime * 15);
 	}
 
-	void OnMouseExit()
+	void NormalSize()
 	{
 		transform.localScale = m_defaultSize;
 	}
