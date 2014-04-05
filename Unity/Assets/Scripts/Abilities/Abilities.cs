@@ -50,6 +50,212 @@ namespace Assets.Scripts.Abilities
 		}
 	}
 
+    public class FireBallAbility : ICooldown, ICastable
+    {
+        private readonly float _cooldown;
+        private float _timer = 0.0f;
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public FireBallAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _cooldown = cooldown;
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+        
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+			//Call some apply function on all players within range and give them
+			//the ability's effects.
+			_timer = 0.0f;
+			throw new NotImplementedException();
+        }
+
+    }
+
+    public class LaserAbility : ICooldown, ICastable
+    {
+        private readonly float _cooldown;
+        private float _timer = 0.0f;
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public LaserAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _cooldown = cooldown;
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+    }
+
+    public class ReplusionAbility : ICooldown, ICastable
+    {
+        private readonly float _cooldown;
+        private float _timer = 0.0f;
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public ReplusionAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _cooldown = cooldown;
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+    }
+
+    public class IncrediLeapAbility : ICooldown, ICastable
+    {
+        private readonly float _cooldown;
+        private float _timer = 0.0f;
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public IncrediLeapAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _cooldown = cooldown;
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+    }
+
+    public class TerraformAbility : ICooldown, ICastable
+    {
+        private readonly float _cooldown;
+        private float _timer = 0.0f;
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public TerraformAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _cooldown = cooldown;
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+    }
+
+    public class SelfImmolationAbility : ICastable
+    {
+        private readonly float _range;
+        private readonly Effects.IEffect[] _effects;
+
+        public SelfImmolationAbility(float cooldown, float range, params Effects.IEffect[] effects)
+        {
+            _range = range;
+            _effects = effects;
+        }
+
+        bool ICooldown.IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+        void ICooldown.UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+        void ICastable.Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            throw new NotImplementedException();
+        }
+
+    }
+
 	namespace Effects
 	{
 		public interface IEffect { }
