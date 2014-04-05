@@ -33,6 +33,11 @@ public partial class Player
         get { return _isWallLeftSide ? -1 : 1; }
     }
 
+    private float GetWallClimbDist
+    {
+        get { return Controller.radius*1.1f;  }
+    }
+
     private float GetFeetHeight
     {
         get { return transform.position.y - (Controller.height/2f); }
@@ -81,7 +86,7 @@ public partial class Player
             _force.y = input.y*_climbSpeed;
 
             _isFlying = false;
-            _canJump = true;
+            _canJump = false;
 
             // leaping from wall (sideways motion)
             if (input.x >= (JumpJoyAxisThreshold * -GetWallSideNormal) && _canJump)
@@ -137,6 +142,8 @@ public partial class Player
         // _acceleration = _force / mass; (assume 1.0f, use force in place of acceleration)
         _velocity += _force*Time.deltaTime;
         _velocity.x = Mathf.Clamp(_velocity.x, -_runSpeed, _runSpeed);
+
+        //Debug.Log(_velocity + ", " + _force);
 
         Controller.Move((_velocity - _force*Time.deltaTime/2f)*Time.deltaTime);
 
@@ -197,8 +204,7 @@ public partial class Player
         // raycast in direction
         RaycastHit hitInfo;
 
-        if (Physics.Raycast(transform.position, Vector3.right * GetWallSideNormal, out hitInfo,
-            Controller.radius*2f))
+        if (Physics.Raycast(transform.position, Vector3.right * GetWallSideNormal, out hitInfo, GetWallClimbDist))
         {
             if (!(hitInfo.collider is BoxCollider)) return false;
 
@@ -210,21 +216,17 @@ public partial class Player
 
     private bool HasFoundClimbingApex()
     {
-        // raycast slightly downwards from middle of player, towards the ground
         RaycastHit hitInfo;
 
-        Vector3 rayDirection = Vector3.right * GetWallSideNormal;
-        rayDirection.y = -0.1f; // slightly downward
-
-        if (Physics.Raycast(transform.position, rayDirection, out hitInfo))
+        if (Physics.Raycast(transform.position, Vector3.right * GetWallSideNormal, out hitInfo, GetWallClimbDist))
         {
             if (!(hitInfo.collider is BoxCollider)) return false;
             
             // look for floors (0, 1, 0), not walls (1, 0, 0)
-            return (hitInfo.normal.y > 0.99f);
+            return (!Equals(hitInfo.normal.x, 1f));
         }
 
-        return false;
+        return true;
     }
 
     private float GetJumpSpeed(float jumpHeight)
