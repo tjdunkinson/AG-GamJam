@@ -18,6 +18,16 @@ public partial class Player
     private bool _canJump;
     private bool _canClimb;
 
+    private float GetFeetHeight
+    {
+        get { return transform.position.y - (Controller.height/2f); }
+    }
+
+    private float GetNewJumpTarget
+    {
+        get { return GetFeetHeight + _jumpHeight; }
+    }
+
     private bool HasCollided
     {
         get { return Controller.collisionFlags != CollisionFlags.None; }
@@ -73,9 +83,10 @@ public partial class Player
         // jumping
         if (input.y >= JumpJoyAxisThreshold && _canJump)
         {
-            _force.y = GetJumpForce(_jumpHeight);
             _canJump = false;
             _isFlying = true & _canFly;
+
+            _velocity.y = GetJumpSpeed(_jumpHeight);
         }
 
         if (_isFlying)
@@ -92,7 +103,6 @@ public partial class Player
         // _acceleration = _force / mass; (assume 1.0f, use force in place of acceleration)
         _velocity += _force * Time.deltaTime;
         _velocity.x = Mathf.Clamp(_velocity.x, -_runSpeed, _runSpeed);
-        //_velocity.y = Mathf.Clamp(_velocity.y, );
 
         Controller.Move((_velocity - _force * Time.deltaTime / 2f) * Time.deltaTime);
 
@@ -171,8 +181,8 @@ public partial class Player
         // touching ground (and not reattaching to wall)
     }
 
-    private float GetJumpForce(float jumpHeight)
+    private float GetJumpSpeed(float jumpHeight)
     {
-		return Mathf.Sqrt(2f * jumpHeight * _gravity);	
+        return Mathf.Sqrt(2f * jumpHeight * _gravity); 
     }
 }
