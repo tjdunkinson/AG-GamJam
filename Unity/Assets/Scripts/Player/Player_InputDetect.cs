@@ -1,21 +1,15 @@
 ﻿using UnityEngine;
+using InControl;
 
 public partial class Player
 {
     // input
-
-    private string MovementAxisName
-    {
-        get { return _slot + " Movement"; }
-    }
-
-
     private Vector2 MovementAxis
     {
         get
         {
-            return new Vector2(Input.GetAxis(MovementAxisName + " X"),
-                -Input.GetAxis(MovementAxisName + " Y"));
+            return new Vector2(InputManager.ActiveDevice.LeftStickX,
+                InputManager.ActiveDevice.LeftStickY);
             // NOTE: We invert the Y-axis input because up should be +1, not -1
         }
     }
@@ -29,19 +23,19 @@ public partial class Player
     {
         get
         {
-            return new Vector2(Input.GetAxis(AimingAxisName + " X"),
-                -Input.GetAxis(AimingAxisName + " Y"));
+            return new Vector2(InputManager.ActiveDevice.RightStickY,
+                InputManager.ActiveDevice.RightStickY);
         }
     }
 
     private bool MeleeTrigger
     {
-        get { return Input.GetButtonDown(_slot + " Melee Trigger"); }
+        get { return InputManager.ActiveDevice.LeftTrigger; }
     }
 
     private bool InteractionTrigger
     {
-        get { return Input.GetButtonDown(_slot + " Interaction Trigger"); }
+        get { return InputManager.ActiveDevice.RightTrigger; }
     }
 
     private AbilitySlot AbilityButton
@@ -49,10 +43,10 @@ public partial class Player
         get
         {
             // TODO: Additional priority handling for held button attacks?
-            if (Input.GetButtonDown(_slot + " Ability 1")) return AbilitySlot.Slot1;
-            if (Input.GetButtonDown(_slot + " Ability 2")) return AbilitySlot.Slot2;
-            if (Input.GetButtonDown(_slot + " Ability 3")) return AbilitySlot.Slot3;
-            if (Input.GetButtonDown(_slot + " Ability 4")) return AbilitySlot.Slot4;
+            if (InputManager.ActiveDevice.Action1) return AbilitySlot.Slot1;
+            if (InputManager.ActiveDevice.Action2) return AbilitySlot.Slot2;
+            if (InputManager.ActiveDevice.Action3) return AbilitySlot.Slot3;
+            if (InputManager.ActiveDevice.Action4) return AbilitySlot.Slot4;
 
             return AbilitySlot.None;
         }
