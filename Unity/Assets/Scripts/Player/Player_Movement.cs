@@ -2,21 +2,36 @@
 
 public partial class Player
 {
-    [SerializeField] private float _runSpeed = 45f;
-    [SerializeField] private float _flySpeed = 33f;
-    [SerializeField] private float _groundFrictionFactor = 0.5f;
-    [SerializeField] private float _airFrictionFactor = 0.9f;
-    [SerializeField] private float _jumpHeight = 3f;
-    [SerializeField] private float _gravity = 0.981f;
-    [SerializeField] private bool _canFly;
-
     private const float JumpJoyAxisThreshold = 0.5f;
 
+    [SerializeField] private float _airFrictionFactor = 0.9f;
+    [SerializeField] private float _groundFrictionFactor = 0.5f;
+    [SerializeField] private float _climbFrictionFactor = 0.5f;
+
+    [SerializeField] private bool _canFly;
+
+    [SerializeField] private float _flySpeed = 33f;
+    [SerializeField] private float _climbSpeed = 25f;
+    [SerializeField] private float _runSpeed = 45f;
+    [SerializeField] private float _jumpHeight = 3f; 
+    [SerializeField] private float _gravity = 0.981f;
+
+    private Vector3 _force = Vector3.zero;
+    private Vector3 _velocity = Vector3.zero;
+
+    private bool _canClimb;
+    private bool _canJump;
+
     private bool _isClimbing;
+    private bool _isClimbingApex;
     private bool _isFlying;
 
-    private bool _canJump;
-    private bool _canClimb;
+    private bool _isWallLeftSide; // else right side
+
+    private int GetWallSideNormal
+    {
+        get { return _isWallLeftSide ? -1 : 1; }
+    }
 
     private float GetFeetHeight
     {
@@ -48,9 +63,6 @@ public partial class Player
         get { return (Controller.collisionFlags & CollisionFlags.CollidedBelow) != 0; }
     }
 
-    private Vector3 _force = Vector3.zero;
-    private Vector3 _velocity = Vector3.zero;
-
     private void MovementInputEvent(Vector2 input)
     {
         // horizontal movement
@@ -65,23 +77,45 @@ public partial class Player
         // climbing
         if (_isClimbing)
         {
-            ClimbingLogic(input);
+            // climbing verticality
+            _force.y = input.y*_climbSpeed;
+
+            _isFlying = false;
+            _canJump = true;
+
+            // leaping from wall (sideways motion)
+            if (input.x >= (JumpJoyAxisThreshold * -GetWallSideNormal) && _canJump)
+            {
+                // force away from wall
+                _canJump = false;
+                _isFlying = true & _canFly;
+                _isClimbing = false;
+
+                float jumpSpeed = GetJumpSpeed(Mathf.Sqrt(_jumpHeight));
+                _velocity.x = jumpSpeed;
+                _velocity.y = jumpSpeed;
+            }
+            else if (HasFoundClimbingApex())
+            {
+                // force into wall apex
+                _canJump = false;
+                _isClimbing = false;
+
+                _velocity.x = GetJumpSpeed(Controller.radius * 8f) * GetWallSideNormal;
+                _velocity.y = GetJumpSpeed(Controller.height * 8f);
+            }
         }
+
         if (_canClimb)
         {
             _canClimb = false;
 
             // check for valid surface
-            _isClimbing = HasFoundClimbingSurface(_velocity.x);
+            _isClimbing = HasFoundClimbingSurface();
         }
 
-        // collide side
-        // if collision with box collider of no rotation (???)
-        // attach to face
-
-
         // jumping
-        if (input.y >= JumpJoyAxisThreshold && _canJump)
+        if (input.y >= JumpJoyAxisThreshold && _canJump && !_isClimbing)
         {
             _canJump = false;
             _isFlying = true & _canFly;
@@ -89,11 +123,11 @@ public partial class Player
             _velocity.y = GetJumpSpeed(_jumpHeight);
         }
 
-        if (_isFlying)
+        if (_isFlying && _canFly)
         {
             _force.y = input.y*_flySpeed;
         }
-        else
+        else if (!_isClimbing)
         {
             // apply gravity here
             _force.y -= Mathf.Abs(_gravity);
@@ -101,27 +135,34 @@ public partial class Player
 
         // perform movement here
         // _acceleration = _force / mass; (assume 1.0f, use force in place of acceleration)
-        _velocity += _force * Time.deltaTime;
+        _velocity += _force*Time.deltaTime;
         _velocity.x = Mathf.Clamp(_velocity.x, -_runSpeed, _runSpeed);
 
-        Controller.Move((_velocity - _force * Time.deltaTime / 2f) * Time.deltaTime);
+        Controller.Move((_velocity - _force*Time.deltaTime/2f)*Time.deltaTime);
 
         // post-move hackery
-        if (_isFlying)
+        if (_isFlying && _canFly)
         {
             _velocity.y *= _airFrictionFactor;
             _velocity.x *= _airFrictionFactor;
         }
-        
+        else if (_isClimbing & !_isClimbingApex)
+        {
+            _velocity.y *= _climbFrictionFactor;
+        }
+
         // end normal movement functions
         if (!HasCollided) return;
 
         // perform collisions here
-        Vector3 undoCollideMovement = _velocity * Time.deltaTime;
+        Vector3 undoCollideMovement = _velocity*Time.deltaTime;
 
         if (HasCollidedSides)
         {
             undoCollideMovement.x *= -1f;
+
+            if (!_isClimbing) _isWallLeftSide = _velocity.x < 0f;
+            if (_isClimbingApex) return;
 
             _velocity.x = 0f;
             _force.x = 0f;
@@ -143,26 +184,23 @@ public partial class Player
                 _velocity.x *= _groundFrictionFactor;
                 _canJump = true;
                 _isFlying = false;
+                _isClimbing = false;
             }
         }
-        
+
         // perform adjustment movement
         transform.Translate(undoCollideMovement);
     }
 
-    private bool HasFoundClimbingSurface(float horizontalDirection)
+    private bool HasFoundClimbingSurface()
     {
         // raycast in direction
         RaycastHit hitInfo;
 
-        if (Physics.Raycast(transform.position, (horizontalDirection > 0f ? Vector3.right : Vector3.left), out hitInfo,
-            Controller.radius * 2f))
+        if (Physics.Raycast(transform.position, Vector3.right * GetWallSideNormal, out hitInfo,
+            Controller.radius*2f))
         {
             if (!(hitInfo.collider is BoxCollider)) return false;
-
-            // get surface x-pos
-
-            // get surface apex
 
             return true;
         }
@@ -170,19 +208,27 @@ public partial class Player
         return false;
     }
 
-    private void ClimbingLogic(Vector2 input)
+    private bool HasFoundClimbingApex()
     {
-        // climbing verticality
+        // raycast slightly downwards from middle of player, towards the ground
+        RaycastHit hitInfo;
 
-        // leaping from wall (sideways motion)
-        
-        // climbing over
+        Vector3 rayDirection = Vector3.right * GetWallSideNormal;
+        rayDirection.y = -0.1f; // slightly downward
 
-        // touching ground (and not reattaching to wall)
+        if (Physics.Raycast(transform.position, rayDirection, out hitInfo))
+        {
+            if (!(hitInfo.collider is BoxCollider)) return false;
+            
+            // look for floors (0, 1, 0), not walls (1, 0, 0)
+            return (hitInfo.normal.y > 0.99f);
+        }
+
+        return false;
     }
 
     private float GetJumpSpeed(float jumpHeight)
     {
-        return Mathf.Sqrt(2f * jumpHeight * _gravity); 
+        return Mathf.Sqrt(2f*jumpHeight*_gravity);
     }
 }
