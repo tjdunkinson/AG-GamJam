@@ -8,15 +8,15 @@ namespace Assets.Scripts.Abilities
 	public interface IAbility { }
 	public interface IApplyImmediate
 	{
-		void ApplyAbility(/*PlayerStats data*/);
+		void ApplyAbility(Player.PlayerData data);
 	}
 	public interface ICastable : IAbility
 	{
-		void Cast(/*PlayerStats data*/);
+		void Cast(Player.PlayerData data);
 	}
 	public interface IPersistent
 	{
-		void UpdateAbility(/*PlayerState data*/);
+		void UpdateAbility(Player.PlayerData data);
 		bool IsActive
 		{
 			get;
@@ -89,7 +89,7 @@ namespace Assets.Scripts.Abilities
 			_timer += Time.deltaTime;
 		}
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
 		{
 			//Get enemy positions from PlayerStats and do range checking.
 			//Call some apply function on all players within range and give them
@@ -126,7 +126,7 @@ namespace Assets.Scripts.Abilities
 			_timer += Time.deltaTime;
 		}
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
 		{
 			//Get enemy positions from PlayerStats and do range checking.
 			//Call some apply function on all players within range and give them
@@ -150,7 +150,7 @@ namespace Assets.Scripts.Abilities
 			_timer += Time.deltaTime;
 		}
 
-		public void Cast(/*PlayerStats data*/)
+		public void Cast(Player.PlayerData data)
 		{
 			//Get enemy positions from PlayerStats and do range checking.
 			//Call some apply function on all players within range and give them
@@ -187,7 +187,7 @@ namespace Assets.Scripts.Abilities
             _timer += Time.deltaTime;
         }
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
         {
             //Get enemy positions from PlayerStats and do range checking.
             //Call some apply function on all players within range and give them
@@ -224,7 +224,7 @@ namespace Assets.Scripts.Abilities
             _timer += Time.deltaTime;
         }
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
         {
             //Get enemy positions from PlayerStats and do range checking.
             //Call some apply function on all players within range and give them
@@ -261,7 +261,7 @@ namespace Assets.Scripts.Abilities
             _timer += Time.deltaTime;
         }
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
         {
             //Get enemy positions from PlayerStats and do range checking.
             //Call some apply function on all players within range and give them
@@ -291,7 +291,7 @@ namespace Assets.Scripts.Abilities
 			Debug.Log(_range);
         }
 
-		public void Cast(/*PlayerState data*/)
+		public void Cast(Player.PlayerData data)
         {
 			if(_active)
 			{
@@ -308,7 +308,7 @@ namespace Assets.Scripts.Abilities
             throw new NotImplementedException();
         }
 
-		public void UpdateAbility(/*PlayerState data*/)
+		public void UpdateAbility(Player.PlayerData data)
 		{
 			//Loop through all other players, apply a damage effect to all
 			//players within range.
@@ -324,8 +324,8 @@ namespace Assets.Scripts.Abilities
 	public class SuperStrength : IAbility, IApplyImmediate
 	{
 		const float _damageIncrease = 2.0f;
-		
-		public void ApplyAbility(/*PlayerStats data*/)
+
+		public void ApplyAbility(Player.PlayerData data)
 		{
 			//Apply damage buff to player.
 			throw new NotImplementedException();
@@ -334,7 +334,7 @@ namespace Assets.Scripts.Abilities
 	public class KineticAbsorption : IAbility, IApplyImmediate
 	{
 		const float _damageMultiplier = 0.75f;
-		public void ApplyAbility(/*PlayerStats data*/)
+		public void ApplyAbility(Player.PlayerData data)
 		{
 			//Apply the defensive buff to this player.
 			throw new NotImplementedException();
@@ -343,7 +343,7 @@ namespace Assets.Scripts.Abilities
 	public class EnergyAbsorption : IAbility, IApplyImmediate
 	{
 		const float _damageMultiplier = 0.75f;
-		public void ApplyAbility(/*PlayerStats data*/)
+		public void ApplyAbility(Player.PlayerData data)
 		{
 			//Apply the defensive buff to this player.
 			throw new NotImplementedException();
@@ -353,7 +353,7 @@ namespace Assets.Scripts.Abilities
 	{
 		const float _healthRegenPerSecond = 0.2f;
 
-		public void ApplyAbility(/*PlayerStats data*/)
+		public void ApplyAbility(Player.PlayerData data)
 		{
 			//Apply regeneration effect to this player.
 			throw new NotImplementedException();
@@ -365,7 +365,7 @@ namespace Assets.Scripts.Abilities
 		const float _damageMultiplier = 0.9f;
 		const float _sizeMultiplier = 2.0f;
 
-		void IApplyImmediate.ApplyAbility(/*PlayerStats data*/)
+		void IApplyImmediate.ApplyAbility(Player.PlayerData data)
 		{
 			//Apply size, physical damage and defensive effects to this player.
 			throw new NotImplementedException();

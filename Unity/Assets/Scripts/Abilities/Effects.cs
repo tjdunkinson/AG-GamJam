@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Abilities.Effects
@@ -7,6 +8,8 @@ namespace Assets.Scripts.Abilities.Effects
 	{
 		float _initialPhysical;
 		float _initialEnergy;
+
+		//List<IEffect> _layeredEffects
 
 		public float InitialPhysicalDamage
 		{
@@ -46,7 +49,11 @@ namespace Assets.Scripts.Abilities.Effects
 		}
 	}
 
-	public interface IEffect { }
+	public interface IEffect
+	{
+		void OnApply(Player.PlayerData data);
+		void OnDetach(Player.PlayerData data);
+	}
 	public interface IDefensiveBuff : IEffect
 	{
 		void ApplyBuff(AttackPacket attackPacket);
@@ -55,28 +62,20 @@ namespace Assets.Scripts.Abilities.Effects
 	{
 		void ApplyBuff(AttackPacket attackPacket);
 	}
-	public interface IDamaging : IEffect
-	{
-		AttackPacket GetAttackPacket(/*PlayerStats data*/);
-	}
 	public interface IUpdateable : IEffect
 	{
-		void UpdateEffect(/*PlayerStats data*/);
-	}
-	public interface IInstant : IEffect
-	{
-		void ApplyEffect(/*PlayerStats data*/);
+		void UpdateEffect(Player.PlayerData data);
 	}
 	public interface IRemoveable : IEffect
 	{
-		bool ToRemove(/*PlayerStats data*/);
+		bool ToRemove(Player.PlayerData data);
 	}
 	public interface IToggle : IUpdateable
 	{
 		void ToggleEffect();
 	}
 
-	public class PhysicalDamage : IInstant, IDamaging
+	public class PhysicalDamage : IEffect
 	{
 		readonly float _damage;
 
@@ -86,18 +85,23 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_damage);
 		}
 
-		public void ApplyEffect(/*PlayerStats data*/)
-		{
-			//Apply a physical damage attack packet to the provided player.
-			throw new NotImplementedException();
-		}
-
-		public AttackPacket GetAttackPacket(/*PlayerStats data*/)
+		public AttackPacket GetAttackPacket(Player.PlayerData data)
 		{
 			return new AttackPacket(_damage);
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			data.Player.AttackPlayer(GetAttackPacket(data));
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
-	public class EnergyDamage : IInstant, IDamaging
+	public class EnergyDamage : IEffect
 	{
 		readonly float _damage;
 
@@ -107,18 +111,22 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_damage);
 		}
 
-		public void ApplyEffect(/*PlayerStats data*/)
-		{
-			//Apply a physical damage attack packet to the provided player.
-			throw new NotImplementedException();
-		}
-
-		public AttackPacket GetAttackPacket(/*PlayerStats data*/)
+		public AttackPacket GetAttackPacket(Player.PlayerData data)
 		{
 			return new AttackPacket(energyDamage: _damage);
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
-	public class EnergyDamagePerSecond : IUpdateable, IRemoveable, IDamaging
+	public class EnergyDamagePerSecond : IUpdateable, IRemoveable, IEffect
 	{
 		readonly float _damagePerSecond;
 		readonly float _duration;
@@ -133,7 +141,7 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_damagePerSecond);
 		}
 
-		public void UpdateEffect(/*PlayerStats data*/)
+		public void UpdateEffect(Player.PlayerData data)
 		{
 			float dt = Time.deltaTime;
 			_timer += dt;
@@ -147,14 +155,24 @@ namespace Assets.Scripts.Abilities.Effects
 			throw new NotImplementedException();
 		}
 
-		public bool ToRemove()
+		public bool ToRemove(Player.PlayerData data)
 		{
 			return _remove;
 		}
 
-		public AttackPacket GetAttackPacket(/*PlayerStats data*/)
+		public AttackPacket GetAttackPacket(Player.PlayerData data)
 		{
 			return new AttackPacket(energyDamage: _damageThisFrame);
+		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 	public class ToggleEnergyDPS : EnergyDamagePerSecond, IToggle
@@ -183,7 +201,7 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_moveMultiply);
 		}
 
-		public void UpdateEffect(/*PlayerStats data*/)
+		public void UpdateEffect(Player.PlayerData data)
 		{
 			_timer += Time.deltaTime;
 			if (_timer >= _duration)
@@ -193,9 +211,19 @@ namespace Assets.Scripts.Abilities.Effects
 
 			throw new NotImplementedException("MoveSpeedScale.UpdateEffect not fully implemented.");
 		}
-		public bool ToRemove(/*PlayerStats data*/)
+		public bool ToRemove(Player.PlayerData data)
 		{
 			return _remove;
+		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 	public class PhysicalAttackBuff : IOffensiveBuff
@@ -212,6 +240,16 @@ namespace Assets.Scripts.Abilities.Effects
 		{
 			throw new NotImplementedException("PhysicalAttackBuff.Applybuff has not been implemented.");
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
 	public class PhysicalDefenseBuff : IDefensiveBuff
 	{
@@ -226,6 +264,16 @@ namespace Assets.Scripts.Abilities.Effects
 		public void ApplyBuff(AttackPacket attackPacket)
 		{
 			throw new NotImplementedException("PhysicalDefenseBuff.Applybuff has not been implemented.");
+		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 	public class EnergyDefenseBuff : IDefensiveBuff
@@ -242,6 +290,16 @@ namespace Assets.Scripts.Abilities.Effects
 		{
 			throw new NotImplementedException("EnergyDefenseBuff.Applybuff has not been implemented.");
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
 	public class HealthRegeneration : IUpdateable
 	{
@@ -252,9 +310,19 @@ namespace Assets.Scripts.Abilities.Effects
 			_hitPointsPerSecond = regenRate;
 			Debug.Log(_hitPointsPerSecond);
 		}
-		public void UpdateEffect(/*PlayerStats data*/)
+		public void UpdateEffect(Player.PlayerData data)
 		{
 			throw new NotImplementedException("HealthRegeneration.UpdateEffect has not been implemented.");
+		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 	public class AttackSpeedScale : IUpdateable, IRemoveable
@@ -273,7 +341,7 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_attackSpeedMultiply);
 		}
 
-		public void UpdateEffect(/*PlayerStats data*/)
+		public void UpdateEffect(Player.PlayerData data)
 		{
 			_timer += Time.deltaTime;
 			if (_timer >= _duration)
@@ -284,12 +352,22 @@ namespace Assets.Scripts.Abilities.Effects
 			throw new NotImplementedException();
 		}
 
-		public bool ToRemove(/*PlayerStats data*/)
+		public bool ToRemove(Player.PlayerData data)
 		{
 			return _remove;
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
-	public class Growth : IInstant
+	public class Growth : IEffect
 	{
 		private readonly float _scaleMultiplier;
 
@@ -299,13 +377,23 @@ namespace Assets.Scripts.Abilities.Effects
 			Debug.Log(_scaleMultiplier);
 		}
 
-		public void ApplyEffect(/*PlayerStats data*/)
+		public void ApplyEffect(Player.PlayerData data)
 		{
 			//Apply player resize here.
 			throw new NotImplementedException("Gigantism.ApplyEffect has not been implemented.");
 		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
 	}
-	public class Silence : IUpdateable, IRemoveable, IInstant
+	public class Silence : IUpdateable, IRemoveable
 	{
 		private readonly float _duration;
 		private float _timer = 0.0f;
@@ -316,12 +404,12 @@ namespace Assets.Scripts.Abilities.Effects
 			_duration = silenceDuration;
 		}
 
-		public void ApplyEffect(/*PlayerStats data*/)
+		public void ApplyEffect(Player.PlayerData data)
 		{
 			//Apply silence effect to this player.
 			throw new NotImplementedException("Silence.ApplyEffect has not been implemented.");
 		}
-		public void UpdateEffect(/*PlayerStats data*/)
+		public void UpdateEffect(Player.PlayerData data)
 		{
 			_timer += Time.deltaTime;
 			if (_timer >= _duration)
@@ -331,9 +419,19 @@ namespace Assets.Scripts.Abilities.Effects
 			}
 			throw new NotImplementedException("Silence.UpdateEffect is not fully implemented");
 		}
-		public bool ToRemove(/*PlayerStats data*/)
+		public bool ToRemove(Player.PlayerData data)
 		{
 			return _remove;
+		}
+
+		public void OnApply(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void OnDetach(Player.PlayerData data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

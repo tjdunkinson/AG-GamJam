@@ -15,6 +15,9 @@ public partial class Player
         {
             Debug.LogWarning("Animation prefab not properly implemented on Player gameobject as child.");
         }
+
+		//For initialising the abilities part of this class
+		InitAbilitiesData();
     }
 
     private void Update()

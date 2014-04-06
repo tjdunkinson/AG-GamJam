@@ -9,6 +9,7 @@ public partial class Player
     private void AbilityInputEvent(AbilitySlot input)
     {
         if (input == AbilitySlot.None) return;
+		HandleAbilityInput(input);
     }
 
     private void MeleeInputEvent()
