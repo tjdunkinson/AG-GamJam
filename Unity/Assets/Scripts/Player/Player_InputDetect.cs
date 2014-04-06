@@ -13,12 +13,6 @@ public partial class Player
             // NOTE: We invert the Y-axis input because up should be +1, not -1
         }
     }
-
-    private string AimingAxisName
-    {
-        get { return _slot + " Aiming"; }
-    }
-
     private Vector2 AimingAxis
     {
         get
