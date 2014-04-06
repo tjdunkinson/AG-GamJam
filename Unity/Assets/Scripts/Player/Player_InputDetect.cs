@@ -8,8 +8,8 @@ public partial class Player
     {
         get
         {
-            return new Vector2(InputManager.ActiveDevice.LeftStickX,
-                InputManager.ActiveDevice.LeftStickY);
+            return new Vector2(_controller.LeftStickX,
+                _controller.LeftStickY);
             // NOTE: We invert the Y-axis input because up should be +1, not -1
         }
     }
@@ -23,19 +23,19 @@ public partial class Player
     {
         get
         {
-            return new Vector2(InputManager.ActiveDevice.RightStickY,
-                InputManager.ActiveDevice.RightStickY);
+            return new Vector2(_controller.RightStickY,
+                _controller.RightStickY);
         }
     }
 
     private bool MeleeTrigger
     {
-        get { return InputManager.ActiveDevice.LeftTrigger; }
+        get { return _controller.LeftTrigger; }
     }
 
     private bool InteractionTrigger
     {
-        get { return InputManager.ActiveDevice.RightTrigger; }
+        get { return _controller.RightTrigger; }
     }
 
     private AbilitySlot AbilityButton
@@ -43,10 +43,10 @@ public partial class Player
         get
         {
             // TODO: Additional priority handling for held button attacks?
-            if (InputManager.ActiveDevice.Action1) return AbilitySlot.Slot1;
-            if (InputManager.ActiveDevice.Action2) return AbilitySlot.Slot2;
-            if (InputManager.ActiveDevice.Action3) return AbilitySlot.Slot3;
-            if (InputManager.ActiveDevice.Action4) return AbilitySlot.Slot4;
+            if (_controller.Action1) return AbilitySlot.Slot1;
+            if (_controller.Action2) return AbilitySlot.Slot2;
+            if (_controller.Action3) return AbilitySlot.Slot3;
+            if (_controller.Action4) return AbilitySlot.Slot4;
 
             return AbilitySlot.None;
         }
