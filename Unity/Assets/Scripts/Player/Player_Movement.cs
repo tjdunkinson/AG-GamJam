@@ -82,6 +82,15 @@ public partial class Player
         {
             // TODO: inherit platform velocity
             _force.x = input.x*_runSpeed;
+
+            if (_force.x == 0f)
+            {
+                SetMecanimTransition(AnimState.Idle);
+            }
+            else
+            {
+                SetMecanimTransition(AnimState.Running);
+            }
         }
 
         // vertical movement
@@ -97,6 +106,8 @@ public partial class Player
             // leaping from wall (sideways motion)
             if (input.x >= (-JumpJoyAxisThreshold * GetWallSideNormal) && _canJump)
             {
+                SetMecanimTransition(AnimState.Jumping);
+
                 // force away from wall
                 _canJump = false;
                 _isFlying = true & _canFly;
@@ -110,6 +121,8 @@ public partial class Player
             }
             else if (HasFoundClimbingApex())
             {
+                SetMecanimTransition(AnimState.Jumping);
+
                 // force into wall apex
                 _canJump = false;
                 _isClimbing = false;
@@ -127,12 +140,19 @@ public partial class Player
 
             // check for valid surface
             _isClimbing = HasFoundClimbingSurface();
-            _canJump |= _isClimbing;    // use for walljump
+
+            if (_isClimbing)
+            {
+                _canJump = true;    // for walljumping
+                SetMecanimTransition(AnimState.Climbing);
+            }
         }
 
         // jumping
         if (input.y >= JumpJoyAxisThreshold && _canJump && !_isClimbing)
         {
+            SetMecanimTransition(AnimState.Jumping);
+
             _canJump = false;
             _isFlying = true & _canFly;
 

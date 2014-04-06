@@ -21,7 +21,6 @@ public partial class Player
     {
         InputManager.Update();
         InputUpdate();
-        MecanimUpdate();
     }
 
     private void OnDrawGizmos()
