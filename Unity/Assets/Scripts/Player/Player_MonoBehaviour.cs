@@ -1,4 +1,6 @@
 ﻿using InControl;
+using UnityEngine;
+
 public partial class Player
 {
     InputDevice _controller;
@@ -13,5 +15,16 @@ public partial class Player
     {
         InputManager.Update();
         InputUpdate();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+
+        //Gizmos.DrawRay(transform.position, Vector3.right);
+        //Gizmos.DrawRay(transform.position, Vector3.left);
+
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3.right * GetWallClimbDist));
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3.left * GetWallClimbDist));
     }
 }

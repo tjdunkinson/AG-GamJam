@@ -23,7 +23,6 @@ public partial class Player
     private bool _canJump;
 
     private bool _isClimbing;
-    private bool _isClimbingApex;
     private bool _isFlying;
 
     private bool _isWallLeftSide; // else right side
@@ -35,7 +34,7 @@ public partial class Player
 
     private float GetWallClimbDist
     {
-        get { return Controller.radius*1.1f;  }
+        get { return Mathf.Max(Controller.radius * 1.25f, Controller.radius + ((_velocity.x * Time.deltaTime) * 2f));  }
     }
 
     private float GetFeetHeight
@@ -86,10 +85,9 @@ public partial class Player
             _force.y = input.y*_climbSpeed;
 
             _isFlying = false;
-            _canJump = false;
 
             // leaping from wall (sideways motion)
-            if (input.x >= (JumpJoyAxisThreshold * -GetWallSideNormal) && _canJump)
+            if (input.x >= (JumpJoyAxisThreshold * GetWallSideNormal) && _canJump)
             {
                 // force away from wall
                 _canJump = false;
@@ -106,6 +104,8 @@ public partial class Player
                 _canJump = false;
                 _isClimbing = false;
 
+                _force.x = 0f;
+                _force.y = 0f;
                 _velocity.x = GetJumpSpeed(Controller.radius * 8f) * GetWallSideNormal;
                 _velocity.y = GetJumpSpeed(Controller.height * 8f);
             }
@@ -153,7 +153,7 @@ public partial class Player
             _velocity.y *= _airFrictionFactor;
             _velocity.x *= _airFrictionFactor;
         }
-        else if (_isClimbing & !_isClimbingApex)
+        else if (_isClimbing)
         {
             _velocity.y *= _climbFrictionFactor;
         }
@@ -169,7 +169,6 @@ public partial class Player
             undoCollideMovement.x *= -1f;
 
             if (!_isClimbing) _isWallLeftSide = _velocity.x < 0f;
-            if (_isClimbingApex) return;
 
             _velocity.x = 0f;
             _force.x = 0f;
