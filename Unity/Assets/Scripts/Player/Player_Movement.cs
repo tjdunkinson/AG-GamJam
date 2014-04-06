@@ -181,7 +181,7 @@ public partial class Player
 
         if (HasCollidedSides)
         {
-            undoCollideMovement.x *= -1f;
+            //undoCollideMovement.x *= -1f;
 
             if (!_isClimbing) _isWallLeftSide = _velocity.x < 0f;
 
@@ -191,7 +191,13 @@ public partial class Player
             _canClimb = true;
         }
 
-        if (HasCollidedAbove || HasCollidedBelow)
+        if (HasCollidedAbove) // || HasCollidedBelow)
+        {
+            _velocity.y = -Mathf.Abs(_velocity.y);
+            _force.y = -Mathf.Abs(_force.y);
+        }
+        else
+        if (HasCollidedBelow)
         {
             undoCollideMovement.y *= -1f;
 
@@ -200,13 +206,11 @@ public partial class Player
             _force.y = 0f;
 
             // apply ground friction here
-            if (HasCollidedBelow)
-            {
-                _velocity.x *= _groundFrictionFactor;
-                _canJump = true;
-                _isFlying = false;
-                _isClimbing = false;
-            }
+            _velocity.x *= _groundFrictionFactor;
+
+            _canJump = true;
+            _isFlying = false;
+            _isClimbing = false;
         }
 
         // perform adjustment movement
@@ -220,9 +224,7 @@ public partial class Player
 
         if (Physics.Raycast(transform.position, Vector3.right * GetWallSideNormal, out hitInfo, GetWallClimbDist))
         {
-            if (!(hitInfo.collider is BoxCollider)) return false;
-
-            return true;
+            return hitInfo.collider is BoxCollider;
         }
 
         return false;
