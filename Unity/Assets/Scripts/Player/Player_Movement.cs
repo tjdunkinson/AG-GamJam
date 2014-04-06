@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public partial class Player
 {
@@ -42,6 +43,11 @@ public partial class Player
         get { return transform.position.y - (Controller.height/2f); }
     }
 
+    private bool IsGrounded
+    {
+        get { return Controller.isGrounded; }
+    }
+
     private float GetNewJumpTarget
     {
         get { return GetFeetHeight + _jumpHeight; }
@@ -67,6 +73,8 @@ public partial class Player
         get { return (Controller.collisionFlags & CollisionFlags.CollidedBelow) != 0; }
     }
 
+    private bool _debugFlag;
+
     private void MovementInputEvent(Vector2 input)
     {
         // horizontal movement
@@ -87,7 +95,7 @@ public partial class Player
             _isFlying = false;
 
             // leaping from wall (sideways motion)
-            if (input.x >= (JumpJoyAxisThreshold * GetWallSideNormal) && _canJump)
+            if (input.x >= (-JumpJoyAxisThreshold * GetWallSideNormal) && _canJump)
             {
                 // force away from wall
                 _canJump = false;
@@ -95,6 +103,8 @@ public partial class Player
                 _isClimbing = false;
 
                 float jumpSpeed = GetJumpSpeed(Mathf.Sqrt(_jumpHeight));
+                _force.x = 0f;
+                _force.y = 0f;
                 _velocity.x = jumpSpeed;
                 _velocity.y = jumpSpeed;
             }
@@ -117,6 +127,7 @@ public partial class Player
 
             // check for valid surface
             _isClimbing = HasFoundClimbingSurface();
+            _canJump |= _isClimbing;    // use for walljump
         }
 
         // jumping
@@ -143,19 +154,23 @@ public partial class Player
         _velocity += _force*Time.deltaTime;
         _velocity.x = Mathf.Clamp(_velocity.x, -_runSpeed, _runSpeed);
 
-        //Debug.Log(_velocity + ", " + _force);
+        // DEBUGGING LINE
+        //Debug.Log(_velocity + "\t" + _force);
 
         Controller.Move((_velocity - _force*Time.deltaTime/2f)*Time.deltaTime);
 
         // post-move hackery
-        if (_isFlying && _canFly)
+        if (!IsGrounded) //_isFlying && _canFly)
         {
-            _velocity.y *= _airFrictionFactor;
-            _velocity.x *= _airFrictionFactor;
-        }
-        else if (_isClimbing)
-        {
-            _velocity.y *= _climbFrictionFactor;
+            if (_isClimbing)
+            {
+                _velocity.y *= _climbFrictionFactor;
+            }
+            else
+            {
+                _velocity.y *= _airFrictionFactor;
+                _velocity.x *= _airFrictionFactor;
+            }
         }
 
         // end normal movement functions
@@ -195,7 +210,7 @@ public partial class Player
         }
 
         // perform adjustment movement
-        transform.Translate(undoCollideMovement);
+        //transform.Translate(undoCollideMovement);
     }
 
     private bool HasFoundClimbingSurface()
