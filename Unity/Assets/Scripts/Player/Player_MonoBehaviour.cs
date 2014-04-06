@@ -10,12 +10,18 @@ public partial class Player
 
         InputManager.Setup();
         _controller = InputManager.ActiveDevice;
+
+        if (!IsSetupForAnimation())
+        {
+            Debug.LogWarning("Animation prefab not properly implemented on Player gameobject as child.");
+        }
     }
 
     private void Update()
     {
         InputManager.Update();
         InputUpdate();
+        MecanimUpdate();
     }
 
     private void OnDrawGizmos()
