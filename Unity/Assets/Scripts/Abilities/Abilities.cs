@@ -1,46 +1,95 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Assets.Scripts.Abilities.Effects;
 
 namespace Assets.Scripts.Abilities
 {
 	public interface IAbility { }
+	public interface IApplyImmediate
+	{
+		void ApplyAbility(/*PlayerStats data*/);
+	}
 	public interface ICastable : IAbility
 	{
 		void Cast(/*PlayerStats data*/);
 	}
-
+	public interface IPersistent
+	{
+		void UpdateAbility(/*PlayerState data*/);
+		bool IsActive
+		{
+			get;
+		}
+	}
 	public interface ICooldown : ICastable
 	{
 		bool IsCastable();
 		void UpdateCooldown();
+
+		float CooldownTime { get; }
 	}
 
-	public class ColdSnapAbility : ICooldown, ICastable
+	public class FireBall : ICooldown, ICastable
 	{
-		private readonly float _cooldown;
-		private float _timer = 0.0f;
-		private readonly float _range;
-		private readonly Effects.IEffect[] _effects;
-
-		public ColdSnapAbility(float cooldown, float range, params Effects.IEffect[] effects)
+		[RequireComponent(typeof(Rigidbody), typeof(Collider))]
+		public sealed class FireBallProjectile : MonoBehaviour
 		{
-			_cooldown = cooldown;
-			_range = range;
-			_effects = effects;
-			Debug.Log(_range);
-			Debug.Log(_effects);
+			public Vector3 InitialVelocity
+			{
+				get;
+				set;
+			}
+			public GameObject CastingPlayer
+			{
+				get;
+				set;
+			}
+
+			void Start()
+			{
+				GetComponent<Rigidbody>().velocity = InitialVelocity;
+			}
+
+			void OnCollisionEnter(Collision other)
+			{
+				GameObject otherObject = other.gameObject;
+				if (otherObject.CompareTag(""/*Player tag here*/) && otherObject != CastingPlayer)
+				{
+					//Apply fireball effects to opposing player
+				}
+				throw new NotImplementedException();
+			}
 		}
 
-		bool ICooldown.IsCastable()
+		readonly float _cooldown;
+		float _timer = 0.0f;
+		readonly GameObject _fireBall;
+
+		public float CooldownTime
+		{
+			get { return _cooldown - _timer; }
+		}
+
+		public FireBall(float cooldown, GameObject fireBall)
+		{
+			_cooldown = cooldown;
+			_fireBall = fireBall;
+			_timer = _cooldown;
+			Debug.Log(_fireBall);
+		}
+
+		public bool IsCastable()
 		{
 			return _timer >= _cooldown;
 		}
-		void ICooldown.UpdateCooldown()
+
+		public void UpdateCooldown()
 		{
 			_timer += Time.deltaTime;
 		}
 
-		void ICastable.Cast(/*PlayerStats data*/)
+		public void Cast(/*PlayerState data*/)
 		{
 			//Get enemy positions from PlayerStats and do range checking.
 			//Call some apply function on all players within range and give them
@@ -49,441 +98,277 @@ namespace Assets.Scripts.Abilities
 			throw new NotImplementedException();
 		}
 	}
+	public class Laser : ICooldown, ICastable
+	{
+		readonly float _cooldown;
+		float _timer = 0.0f;
+		readonly float _range;
 
-    public class FireBallAbility : ICooldown, ICastable
-    {
-        private readonly float _cooldown;
-        private float _timer = 0.0f;
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
+		public float CooldownTime
+		{
+			get { return _cooldown - _timer; }
+		}
 
-        public FireBallAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _cooldown = cooldown;
-            _range = range;
-            _effects = effects;
-        }
+		public Laser(float cooldown, float range)
+		{
+			_cooldown = cooldown;
+			_range = range;
+			Debug.Log(_range);
+		}
 
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
+		public bool IsCastable()
+		{
+			return _timer >= _cooldown;
+		}
 
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-        
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
+		public void UpdateCooldown()
+		{
+			_timer += Time.deltaTime;
+		}
+
+		public void Cast(/*PlayerState data*/)
+		{
+			//Get enemy positions from PlayerStats and do range checking.
 			//Call some apply function on all players within range and give them
 			//the ability's effects.
 			_timer = 0.0f;
 			throw new NotImplementedException();
-        }
-
-    }
-
-    public class LaserAbility : ICooldown, ICastable
-    {
-        private readonly float _cooldown;
-        private float _timer = 0.0f;
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
-
-        public LaserAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _cooldown = cooldown;
-            _range = range;
-            _effects = effects;
-        }
-
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
-
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
-            //Call some apply function on all players within range and give them
-            //the ability's effects.
-            _timer = 0.0f;
-            throw new NotImplementedException();
-        }
-
-    }
-
-    public class ReplusionAbility : ICooldown, ICastable
-    {
-        private readonly float _cooldown;
-        private float _timer = 0.0f;
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
-
-        public ReplusionAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _cooldown = cooldown;
-            _range = range;
-            _effects = effects;
-        }
-
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
-
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
-            //Call some apply function on all players within range and give them
-            //the ability's effects.
-            _timer = 0.0f;
-            throw new NotImplementedException();
-        }
-
-    }
-
-    public class IncrediLeapAbility : ICooldown, ICastable
-    {
-        private readonly float _cooldown;
-        private float _timer = 0.0f;
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
-
-        public IncrediLeapAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _cooldown = cooldown;
-            _range = range;
-            _effects = effects;
-        }
-
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
-
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
-            //Call some apply function on all players within range and give them
-            //the ability's effects.
-            _timer = 0.0f;
-            throw new NotImplementedException();
-        }
-
-    }
-
-    public class TerraformAbility : ICooldown, ICastable
-    {
-        private readonly float _cooldown;
-        private float _timer = 0.0f;
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
-
-        public TerraformAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _cooldown = cooldown;
-            _range = range;
-            _effects = effects;
-        }
-
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
-
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
-            //Call some apply function on all players within range and give them
-            //the ability's effects.
-            _timer = 0.0f;
-            throw new NotImplementedException();
-        }
-
-    }
-
-    public class SelfImmolationAbility : ICastable
-    {
-        private readonly float _range;
-        private readonly Effects.IEffect[] _effects;
-
-        public SelfImmolationAbility(float cooldown, float range, params Effects.IEffect[] effects)
-        {
-            _range = range;
-            _effects = effects;
-        }
-
-        bool ICooldown.IsCastable()
-        {
-            return _timer >= _cooldown;
-        }
-
-        void ICooldown.UpdateCooldown()
-        {
-            _timer += Time.deltaTime;
-        }
-
-        void ICastable.Cast(/*PlayerState data*/)
-        {
-            //Get enemy positions from PlayerStats and do range checking.
-            //Call some apply function on all players within range and give them
-            //the ability's effects.
-            throw new NotImplementedException();
-        }
-
-    }
-
-	namespace Effects
+		}
+	}
+	public class ColdSnap : ICooldown, ICastable
 	{
-		public interface IEffect { }
-		public interface IDefensiveBuff : IEffect
+		const float _cooldown = 10.0f;
+		float _timer = 0.0f;
+		const float _range = 5.0f;
+
+		public bool IsCastable()
 		{
-			void ApplyBuff(/*PlayerOffensiveData data*/);
+			return _timer >= _cooldown;
 		}
-		public interface IOffensiveBuff : IEffect
+		public void UpdateCooldown()
 		{
-			void ApplyBuff(/*PlayerOffensiveData data*/);
-		}
-		public interface IPersistent : IEffect
-		{
-			void UpdateEffect(/*PlayerStats data*/);
-		}
-		public interface IInstant : IEffect
-		{
-			void ApplyEffect(/*PlayerStats data*/);
-		}
-		public interface IRemoveable : IEffect
-		{
-			bool ToRemove(/*PlayerStats data*/);
-		}
-		public interface IToggle : IPersistent
-		{
-			void ToggleEffect();
+			_timer += Time.deltaTime;
 		}
 
-
-		public class Burn : IPersistent, IRemoveable
+		public void Cast(/*PlayerStats data*/)
 		{
-			private readonly float _damagePerSecond;
-			private readonly float _duration;
-			private float _timer = 0.0f;
-			private bool _remove = false;
-
-			public Burn(float burnDamagePerSecond, float burnDuration)
-			{
-				_damagePerSecond = burnDamagePerSecond;
-				_duration = burnDuration;
-				Debug.Log(_damagePerSecond);
-			}
-
-			void IPersistent.UpdateEffect()
-			{
-				_timer += Time.deltaTime;
-				if (_timer >= _duration)
-				{
-					_remove = true;
-				}
-
-				//Apply damage here.
-				throw new NotImplementedException();
-			}
-
-			bool IRemoveable.ToRemove()
-			{
-				return _remove;
-			}
+			//Get enemy positions from PlayerStats and do range checking.
+			//Call some apply function on all players within range and give them
+			//the ability's effects.
+			_timer = 0.0f;
+			throw new NotImplementedException();
 		}
-		public class ColdSnap : IPersistent, IRemoveable
+
+		public float CooldownTime
 		{
-			private bool _remove = false;
-			private readonly float _duration;
-			private readonly float _moveMultiply;
-			private float _timer = 0.0f;
-
-			public ColdSnap(float freezeDuration, float movementMultiplier)
-			{
-				_duration = freezeDuration;
-				_moveMultiply = movementMultiplier;
-				Debug.Log(_moveMultiply);
-			}
-
-			void IPersistent.UpdateEffect(/*PlayerStats data*/)
-			{
-				_timer += Time.deltaTime;
-				if (_timer >= _duration)
-				{
-					_remove = true;
-				}
-
-				throw new NotImplementedException("ColdSnap.UpdateEffect not fully implemented.");
-			}
-			bool IRemoveable.ToRemove(/*PlayerStats data*/)
-			{
-				return _remove;
-			}
+			get { return _cooldown - _timer; }
 		}
-		public class SuperStrength : IOffensiveBuff
+	}
+    public class Replusion : ICooldown, ICastable
+    {
+		readonly float _cooldown;
+		float _timer = 0.0f;
+		readonly float _range;
+
+        public Replusion(float cooldown, float range)
+        {
+            _cooldown = cooldown;
+            _range = range;
+			Debug.Log(_range);
+        }
+
+		public bool IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+		public void UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+		public void Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+		public float CooldownTime
 		{
-			private readonly float _baseDamageMultiply;
-
-			public SuperStrength(float damageMultiplier)
-			{
-				_baseDamageMultiply = damageMultiplier;
-				Debug.Log(_baseDamageMultiply);
-			}
-
-			void IOffensiveBuff.ApplyBuff(/*PlayerOffensiveData data*/)
-			{
-				throw new NotImplementedException("SuperStrength.Applybuff has not been implemented.");
-			}
+			get { return _cooldown - _timer; }
 		}
-		public class KineticAbsorption : IDefensiveBuff
+	}
+    public class IncrediLeap : ICooldown, ICastable
+    {
+        readonly float _cooldown;
+        float _timer = 0.0f;
+        readonly float _range;
+
+        public IncrediLeap(float cooldown, float range)
+        {
+            _cooldown = cooldown;
+            _range = range;
+			Debug.Log(_range);
+        }
+
+		public bool IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+		public void UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+		public void Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+		public float CooldownTime
 		{
-			private readonly float _baseDamageMultiply;
-
-			public KineticAbsorption(float damageMultiply)
-			{
-				_baseDamageMultiply = damageMultiply;
-				Debug.Log(_baseDamageMultiply);
-			}
-
-			void IDefensiveBuff.ApplyBuff(/*PlayerOffensiveData data*/)
-			{
-				throw new NotImplementedException("KineticAbsorption.Applybuff has not been implemented.");
-			}
+			get { return _cooldown - _timer; }
 		}
-		public class EnergyAbsorption : IDefensiveBuff
+	}
+    public class Terraform : ICooldown, ICastable
+    {
+        readonly float _cooldown;
+        float _timer = 0.0f;
+        readonly float _range;
+
+        public Terraform(float cooldown, float range)
+        {
+            _cooldown = cooldown;
+            _range = range;
+			Debug.Log(_range);
+        }
+
+		public bool IsCastable()
+        {
+            return _timer >= _cooldown;
+        }
+
+		public void UpdateCooldown()
+        {
+            _timer += Time.deltaTime;
+        }
+
+		public void Cast(/*PlayerState data*/)
+        {
+            //Get enemy positions from PlayerStats and do range checking.
+            //Call some apply function on all players within range and give them
+            //the ability's effects.
+            _timer = 0.0f;
+            throw new NotImplementedException();
+        }
+
+		public float CooldownTime
 		{
-			private readonly float _energyDamageMultiply;
-
-			public EnergyAbsorption(float damageMultiply)
-			{
-				_energyDamageMultiply = damageMultiply;
-				Debug.Log(_energyDamageMultiply);
-			}
-
-			void IDefensiveBuff.ApplyBuff(/*PlayerOffensiveData data*/)
-			{
-				throw new NotImplementedException("EnergyAbsorption.Applybuff has not been implemented.");
-			}
+			get { return _cooldown - _timer; }
 		}
-		public class ActiveRegeneration : IPersistent
-		{
-			private readonly float _hitPointsPerSecond;
+	}
+	public class SelfImmolation : ICastable, IPersistent
+    {
+        readonly float _range;
+		bool _active = false;
 
-			public ActiveRegeneration(float regenRate)
+		const float DPS = 2;
+		ToggleEnergyDPS _selfDamage;
+		//Dictionary<Player, ToggleEnergyDPS>
+
+        public SelfImmolation(float range)
+        {
+			_selfDamage = new ToggleEnergyDPS(DPS, float.PositiveInfinity);
+            _range = range;
+			Debug.Log(_range);
+        }
+
+		public void Cast(/*PlayerState data*/)
+        {
+			if(_active)
 			{
-				_hitPointsPerSecond = regenRate;
-				Debug.Log(_hitPointsPerSecond);
+				//Loop through all damage effects still active and remove them.
+				_selfDamage.ToggleEffect();
 			}
-			void IPersistent.UpdateEffect(/*PlayerStats data*/)
+			else
 			{
-				throw new NotImplementedException("ActiveRegeneration.UpdateEffect has not been implemented.");
+				_selfDamage.ToggleEffect();
+				//Add damage effect to self here.
 			}
+
+			_active = !_active;
+            throw new NotImplementedException();
+        }
+
+		public void UpdateAbility(/*PlayerState data*/)
+		{
+			//Loop through all other players, apply a damage effect to all
+			//players within range.
+			throw new NotImplementedException();
 		}
-		public class SuperSonicSpeed : IPersistent, IRemoveable
+
+		public bool IsActive
 		{
-			private readonly float _attackSpeedMultiply;
-			private readonly float _movementSpeedMultiply;
-			private readonly float _duration;
-			private float _timer = 0.0f;
-			private bool _remove = false;
-
-			public SuperSonicSpeed(float attackSpeedMul,
-				float movementSpeedMul,
-				float effectDuration)
-			{
-				_attackSpeedMultiply = attackSpeedMul;
-				_movementSpeedMultiply = movementSpeedMul;
-				_duration = effectDuration;
-
-				Debug.Log(_attackSpeedMultiply);
-				Debug.Log(_movementSpeedMultiply);
-			}
-
-			void IPersistent.UpdateEffect(/*PlayerStats data*/)
-			{
-				_timer += Time.deltaTime;
-				if (_timer >= _duration)
-				{
-					_remove = true;
-				}
-
-				throw new NotImplementedException();
-			}
-
-			bool IRemoveable.ToRemove(/*PlayerStats data*/)
-			{
-				return _remove;
-			}
+			get { return _active; }
 		}
-		public class Gigantism : IOffensiveBuff, IDefensiveBuff, IPersistent, IInstant
+	}
+
+	public class SuperStrength : IAbility, IApplyImmediate
+	{
+		const float _damageIncrease = 2.0f;
+		
+		public void ApplyAbility(/*PlayerStats data*/)
 		{
-			private readonly float _baseDamageMultiplier;
-			private readonly float _baseDamageDefenceMultiplier;
-			private readonly float _movementSpeedMultiplier;
-			private readonly float _scaleMultiplier;
+			//Apply damage buff to player.
+			throw new NotImplementedException();
+		}
+	}
+	public class KineticAbsorption : IAbility, IApplyImmediate
+	{
+		const float _damageMultiplier = 0.75f;
+		public void ApplyAbility(/*PlayerStats data*/)
+		{
+			//Apply the defensive buff to this player.
+			throw new NotImplementedException();
+		}
+	}
+	public class EnergyAbsorption : IAbility, IApplyImmediate
+	{
+		const float _damageMultiplier = 0.75f;
+		public void ApplyAbility(/*PlayerStats data*/)
+		{
+			//Apply the defensive buff to this player.
+			throw new NotImplementedException();
+		}
+	}
+	public class ActiveRegeneration : IAbility, IApplyImmediate
+	{
+		const float _healthRegenPerSecond = 0.2f;
 
-			public Gigantism(float baseDamageIncreaseMultiply,
-				float baseDamageDecreaseMultiply, float movementSpeedMultiply,
-				float scaleMultiply)
-			{
-				_baseDamageMultiplier = baseDamageIncreaseMultiply;
-				_baseDamageDefenceMultiplier = baseDamageDecreaseMultiply;
-				_movementSpeedMultiplier = movementSpeedMultiply;
-				_scaleMultiplier = scaleMultiply;
+		public void ApplyAbility(/*PlayerStats data*/)
+		{
+			//Apply regeneration effect to this player.
+			throw new NotImplementedException();
+		}
+	}
+	public class Gigantism : IAbility, IApplyImmediate
+	{
+		const float _damageIncrease = 1.15f;
+		const float _damageMultiplier = 0.9f;
+		const float _sizeMultiplier = 2.0f;
 
-				Debug.Log(_baseDamageMultiplier);
-				Debug.Log(_baseDamageDefenceMultiplier);
-				Debug.Log(_movementSpeedMultiplier);
-				Debug.Log(_scaleMultiplier);
-			}
-
-			void IOffensiveBuff.ApplyBuff(/*PlayerOffensiveData data*/)
-			{
-				//Apply damage offensive multiplier here.
-				throw new NotImplementedException("Gigantism.IOffensiveBuff.ApplyBuff has not been implemented.");
-			}
-			void IDefensiveBuff.ApplyBuff(/*PlayerOffensiveData data*/)
-			{
-				//Apply damage defensive multiplier here.
-				throw new NotImplementedException("Gigantism.IDefensiveBuff.ApplyBuff has not been implemented.");
-			}
-
-			void IPersistent.UpdateEffect(/*PlayerStats data*/)
-			{
-				//Apply movement speed multiplier here.
-				throw new NotImplementedException("Gigantism.UpdateEffect has not been implemented.");
-			}
-
-			void IInstant.ApplyEffect(/*PlayerStats data*/)
-			{
-				//Apply player resize here.
-				throw new NotImplementedException("Gigantism.ApplyEffect has not been implemented.");
-			}
+		void IApplyImmediate.ApplyAbility(/*PlayerStats data*/)
+		{
+			//Apply size, physical damage and defensive effects to this player.
+			throw new NotImplementedException();
 		}
 	}
 }
