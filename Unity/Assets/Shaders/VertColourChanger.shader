@@ -1,0 +1,50 @@
+﻿Shader "Custom/VertColourChange"
+{
+	Properties
+	{
+		_ColorChange ("Vertex Colour Change", color) = (1.0, 1.0, 1.0, 1.0)
+		_Ramp ("Shading Ramp", 2D) = "gray" {}
+	}
+	SubShader
+	{
+		Tags
+		{
+			"RenderType"="Opaque"
+		}
+		LOD 200
+		
+		CGPROGRAM
+		#pragma surface surf Ramp
+		
+		float4 _ColorChange;
+		sampler2D _Ramp;
+		
+				half4 LightingRamp (SurfaceOutput s, half3 lightDir, half atten)
+		{
+			half NdotL = dot (s.Normal, lightDir);
+			half diff = NdotL * 0.5 + 0.5;
+			half3 ramp = tex2D (_Ramp, float2(diff)).rgb;
+			
+			// Returne
+			half4 c;
+			c.rgb = s.Albedo * _LightColor0.rgb * ramp * (atten * 2);
+			c.a = s.Alpha;
+			return c;
+		}
+		
+		struct Input
+		{
+			float4 color : COLOR;
+		};
+		
+		void surf (Input IN, inout SurfaceOutput o)
+		{
+			half3 VertColor = IN.color.rgb;
+			half VertAlpha = IN.color.a;
+			half3 ColorChange = lerp (VertColor, _ColorChange.rgb, VertAlpha);
+			o.Albedo = ColorChange;
+		}
+		ENDCG
+	} 
+	FallBack "Diffuse"
+}
