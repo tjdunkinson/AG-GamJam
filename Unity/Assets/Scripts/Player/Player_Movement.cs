@@ -5,16 +5,16 @@ public partial class Player
 {
     private const float JumpJoyAxisThreshold = 0.5f;
 
-    [SerializeField] private float _airFrictionFactor = 0.9f;
-    [SerializeField] private float _groundFrictionFactor = 0.5f;
-    [SerializeField] private float _climbFrictionFactor = 0.5f;
+    [SerializeField] private float _airFrictionFactor = 0.95f;
+    [SerializeField] private float _groundFrictionFactor = 0.9f;
+    [SerializeField] private float _climbFrictionFactor = 0.75f;
 
     [SerializeField] private bool _canFly;
 
     [SerializeField] private float _flySpeed = 33f;
     [SerializeField] private float _climbSpeed = 25f;
     [SerializeField] private float _runSpeed = 45f;
-    [SerializeField] private float _jumpHeight = 3f; 
+    [SerializeField] private float _jumpHeight = 15f; 
     [SerializeField] private float _gravity = 0.981f;
 
     private Vector3 _force = Vector3.zero;
