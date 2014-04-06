@@ -51,4 +51,9 @@ public class AbilityToolTip : MonoBehaviour
     {
         transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, -50, transform.position.z), Time.deltaTime * Random.Range(.5f,1));
     }
+
+    public void changeColour(Color a_color)
+    {
+        this.renderer.material.SetColor("_ColorToChange", a_color);
+    }
 }

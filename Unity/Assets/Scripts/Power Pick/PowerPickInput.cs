@@ -14,7 +14,7 @@ public partial class PowerPick
     {
         //creates a delay between movements so we dont have teleportation due to joysticks repeating.
         m_moveTimer += Time.deltaTime;
-
+        m_abilityList[m_currentSelection].changeColour(m_players[m_currentPlayer].GetColor());
         //Grab the values of the left joystick for the current player, invert Y.
         float xAxis = m_players[m_currentPlayer].GetController().LeftStickX;
         float yAxis = -m_players[m_currentPlayer].GetController().LeftStickY;
@@ -115,16 +115,20 @@ public partial class PowerPick
         int newSelection = m_currentSelection;
         if (newSelection != originalSelect)
         {
+            m_abilityList[originalSelect].changeColour(Color.white);
             m_abilityList[originalSelect].m_hover = false;
             m_abilityList[newSelection].m_hover = true;
+            m_abilityList[newSelection].changeColour(m_players[m_currentPlayer].GetColor());
         }
 
         if (m_pickTimer < 0)
         {
             m_abilityList[m_currentSelection].m_hover = false;
+            m_abilityList[m_currentSelection].changeColour(Color.white);
             m_currentPlayerSelection = Random.Range(0, m_abilityList.Count);
             while(m_abilityList[m_currentPlayerSelection].m_selected == true)
                 m_currentPlayerSelection = Random.Range(0, m_abilityList.Count);
+
         }
 
     }

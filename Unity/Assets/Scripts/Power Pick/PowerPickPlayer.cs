@@ -11,6 +11,7 @@ public class PowerPickPlayer : MonoBehaviour {
     private List<AbilityToolTip> m_chosenAbilities;
 
     private int m_currentAbilityCount;
+    private Color m_colorTheme;
     
     // Use this for initialization
 	void Start ()
@@ -58,4 +59,7 @@ public class PowerPickPlayer : MonoBehaviour {
 
     public void SetName(string _name) { m_text = _name; }
     public string GetName() { return m_text; }
+
+    public void setColor(Color a_color) { m_colorTheme = a_color; }
+    public Color GetColor() { return m_colorTheme; }
 }

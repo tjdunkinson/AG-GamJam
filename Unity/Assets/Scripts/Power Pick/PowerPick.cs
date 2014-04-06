@@ -78,6 +78,15 @@ public partial class PowerPick : MonoBehaviour
             m_players.Add((PowerPickPlayer)a.GetComponent("PowerPickPlayer"));
             m_players[i].SetName("Player " + (i + 1));
             m_players[i].AttachControler(InputManager.Devices[i]);
+
+            if(i == 0)
+                m_players[i].setColor(Color.red);
+            if (i == 1)
+                m_players[i].setColor(Color.green); 
+            if (i == 2)
+                m_players[i].setColor(Color.yellow);
+            if (i == 3)
+                m_players[i].setColor(Color.blue);
         }
 
         //disables inactive player UI elements
@@ -122,7 +131,7 @@ public partial class PowerPick : MonoBehaviour
             m_pickTimer = 5;
             //greys ability out
             m_abilityList[m_currentPlayerSelection].m_selected = true;
-
+            m_abilityList[m_currentPlayerSelection].changeColour(m_players[m_currentPlayer].GetColor());
             //should add the ability to the players list
             m_players[m_currentPlayer].AddToChosenAbilities(m_abilityList[m_currentPlayerSelection]);
             //resets the current player selected
@@ -138,6 +147,7 @@ public partial class PowerPick : MonoBehaviour
                 m_currentPlayer = 0;
                 m_draftRound++;
             }
+            //m_abilityList[m_currentSelection].changeColour(m_players[m_currentPlayer].GetColor());
         }
     }
 }
