@@ -8,6 +8,9 @@ https:# .gitignore
 
 # Ignore Unity3D temporary/cache directories
 
+Unity/[Ll]ibrary/*/
+Unity/[Tt]emp/
+Unity/[Oo]bj/
 [Ll]ibrary/*/
 [Tt]emp/
 [Oo]bj/
