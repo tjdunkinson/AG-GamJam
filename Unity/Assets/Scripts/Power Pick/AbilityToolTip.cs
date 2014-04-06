@@ -7,7 +7,7 @@ public class AbilityToolTip : MonoBehaviour
 	private string m_name;
 	
 	[SerializeField]
-	private string m_description;
+	public string m_description;
 
 	public bool m_selected = false;
 	public bool m_hover = false;
@@ -20,7 +20,7 @@ public class AbilityToolTip : MonoBehaviour
 	void Start () 
 	{
 		m_defaultSize = this.transform.localScale;
-		m_maxSize = this.transform.localScale * 2.0f;
+		m_maxSize = this.transform.localScale * 1.25f;
 	}
 	
 	// Update is called once per frame
@@ -28,8 +28,12 @@ public class AbilityToolTip : MonoBehaviour
 	{
 		if(m_selected)
 			this.renderer.material.SetFloat("_BWtoColor", 1);
-		if(m_hover)
-			OnHover();
+        else
+            this.renderer.material.SetFloat("_BWtoColor", 0);
+        if (m_hover)
+            OnHover();
+        else
+            NormalSize();
 	}
 
 	public void OnHover()
@@ -38,14 +42,18 @@ public class AbilityToolTip : MonoBehaviour
 			transform.localScale = Vector3.Lerp(transform.localScale, m_maxSize, Time.deltaTime * 15);
 	}
 
-	void OnMouseExit()
+	void NormalSize()
 	{
 		transform.localScale = m_defaultSize;
 	}
 
-	void OnMouseUp()
-	{
-		m_selected = true;
-		transform.localScale = m_defaultSize;
-	}
+    public void Drop()
+    {
+        transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, -50, transform.position.z), Time.deltaTime * Random.Range(.5f,1));
+    }
+
+    public void changeColour(Color a_color)
+    {
+        this.renderer.material.SetColor("_ColorToChange", a_color);
+    }
 }
