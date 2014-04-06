@@ -20,7 +20,7 @@ public class AbilityToolTip : MonoBehaviour
 	void Start () 
 	{
 		m_defaultSize = this.transform.localScale;
-		m_maxSize = this.transform.localScale * 1.5f;
+		m_maxSize = this.transform.localScale * 1.25f;
 	}
 	
 	// Update is called once per frame
@@ -46,4 +46,9 @@ public class AbilityToolTip : MonoBehaviour
 	{
 		transform.localScale = m_defaultSize;
 	}
+
+    public void Drop()
+    {
+        transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, -50, transform.position.z), Time.deltaTime * Random.Range(.5f,1));
+    }
 }

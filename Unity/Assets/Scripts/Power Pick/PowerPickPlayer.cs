@@ -5,8 +5,8 @@ using InControl;
 
 public class PowerPickPlayer : MonoBehaviour {
 
-    public InputDevice m_controller;
-    private TextMesh m_text;
+    private InputDevice m_controller;
+    private string m_text;
 
     private List<AbilityToolTip> m_chosenAbilities;
 
@@ -53,4 +53,9 @@ public class PowerPickPlayer : MonoBehaviour {
         
         m_chosenAbilities.Sort((AbilityToolTip x, AbilityToolTip y) => { return x.name.CompareTo(y.name); });
     }
+
+    public InputDevice GetController() { return m_controller; }
+
+    public void SetName(string _name) { m_text = _name; }
+    public string GetName() { return m_text; }
 }
