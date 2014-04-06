@@ -4,7 +4,12 @@ using InControl;
 
 public partial class PowerPick
 {
-    //input stuff
+    /// Draft Board Movement ///
+    private float m_moveTimer = 0;
+    private int m_currentSelection;
+    [SerializeField]
+    private int m_width;
+    private int m_noOfAbility;
 
     /// <summary>
     /// Controls all the movement and selection around the board.

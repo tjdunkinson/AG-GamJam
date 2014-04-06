@@ -8,12 +8,7 @@ public partial class PowerPick : MonoBehaviour
 	[SerializeField]
     private List<AbilityToolTip> m_abilityList;
  
-    /// Draft Board Movement ///
-    private float m_moveTimer = 0;
-    private int m_currentSelection;
-    [SerializeField]
-    private int m_width;
-    private int m_noOfAbility;
+ 
     [SerializeField]
     private int m_currentPlayer;
     int m_draftRound;
@@ -21,13 +16,13 @@ public partial class PowerPick : MonoBehaviour
 
     private int m_currentPlayerSelection = -1;
 
-    /// End Draft Board ///
-
     /// Initialize Player Block ///
     bool m_Initialized = false;
     private List<PowerPickPlayer> m_players;
     /// End Player Init ///
 
+
+    private float m_startGameTimer = 6;
 	// Use this for initialization
 	void Start () 
 	{
@@ -55,7 +50,7 @@ public partial class PowerPick : MonoBehaviour
         {
             ManageDraft();
         }
-        else if (m_draftRound == 4)
+        else if (m_draftRound >= 4)
         {
             DraftComplete();
         }
@@ -119,9 +114,25 @@ public partial class PowerPick : MonoBehaviour
 
     void DraftComplete()
     {
+        m_startGameTimer -= Time.deltaTime;
+
         for (int i = 0; i < m_abilityList.Count; i++)
             if(m_abilityList[i].m_selected != true)
                 m_abilityList[i].Drop();
+
+        if (m_startGameTimer > 1)
+        {
+            m_startGameTimerText.characterSize = Mathf.Lerp(Mathf.Cos(m_startGameTimer) / 5, Mathf.Sin(m_startGameTimer) / 5, Time.deltaTime);
+            m_startGameTimerText.text = (m_startGameTimer).ToString("0.");
+        }
+        else if (m_startGameTimer < 2)
+        {
+            m_startGameTimerText.text = "GO!";
+        }
+
+        if (m_startGameTimer < -1)
+            Application.LoadLevel("BoxScene");
+
     }
 
     void PlayerHasPicked()

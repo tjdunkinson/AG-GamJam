@@ -7,6 +7,7 @@ public partial class PowerPick
     private TextMesh m_abilityPickTime;
     private TextMesh m_abilityName;
     private TextMesh m_abilityDesc;
+    private TextMesh m_startGameTimerText;
 
     void InitTextElements()
     { 
@@ -14,6 +15,7 @@ public partial class PowerPick
         m_abilityPickTime = (TextMesh)GameObject.Find("PowerPickPickTime").GetComponent("TextMesh");
         m_abilityName = (TextMesh)GameObject.Find("PowerPickName").GetComponent("TextMesh");
         m_abilityDesc = (TextMesh)GameObject.Find("PowerPickInfo").GetComponent("TextMesh");
+        m_startGameTimerText = (TextMesh)GameObject.Find("StartGameTimerText").GetComponent("TextMesh");
     }
 
     void UpdateTextsElements()
