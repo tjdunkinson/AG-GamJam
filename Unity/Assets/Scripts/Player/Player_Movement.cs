@@ -83,13 +83,9 @@ public partial class Player
             // TODO: inherit platform velocity
             _force.x = input.x*_runSpeed;
 
-            if (_force.x == 0f)
+            if (IsGrounded)
             {
-                SetMecanimTransition(AnimState.Idle);
-            }
-            else
-            {
-                SetMecanimTransition(AnimState.Running);
+                SetMecanimTransition(_force.x == 0f ? AnimState.Idle : AnimState.Running);
             }
         }
 
